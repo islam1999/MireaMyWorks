@@ -15,17 +15,21 @@ find_package(Qt5Test REQUIRED)
 set(SOURCES_DIR ${CMAKE_SOURCE_DIR}/src)
 set(HEADERS_DIR ${CMAKE_SOURCE_DIR}/inc)
 set(RESOURCES_DIR ${CMAKE_SOURCE_DIR}/res)
+
 if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
     set(TESTS_DIR ${CMAKE_SOURCE_DIR}/test)
+    file(GLOB TESTS ${TESTS_DIR}/*.cpp ${TESTS_DIR}/*.h)
+    include_directories(test)
+else()
+    set(TESTS "")
 endif ()
 
 file(GLOB HEADERS ${HEADERS_DIR}/*.h)
 file(GLOB SOURCES ${SOURCES_DIR}/*.cpp)
-file(GLOB TESTS ${TESTS_DIR}/*.cpp ${TESTS_DIR}/*.h)
 
-include_directories(inc src test res)
+include_directories(inc src res)
 
-add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${TESTS} test/AutoTest.h)
+add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES} ${TESTS})
 
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${HEADERS_DIR})

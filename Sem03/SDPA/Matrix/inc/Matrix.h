@@ -180,6 +180,7 @@ public:
         return os;
     }
 
+
 private:
     QVector<QVector<T>> _matrix;
 };

@@ -21,6 +21,10 @@
 
 
 #include <QApplication>
+#include "MatrixGuiList.h"
+#ifdef QT_DEBUG
+#include <AutoTest.h>
+#endif
 
 int main(int argc, char *argv[]) {
 
@@ -30,5 +34,8 @@ int main(int argc, char *argv[]) {
     AutoTest::runAllTests(argc, argv);
 #endif
 
+    MatrixGuiList mt;
+    mt.show();
+    a.exec();
     return 0;
 }
