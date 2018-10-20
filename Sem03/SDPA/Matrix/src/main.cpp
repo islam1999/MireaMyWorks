@@ -26,6 +26,8 @@
 #include <AutoTest.h>
 #endif
 
+#include "Matrix.h"
+
 int main(int argc, char *argv[]) {
 
     QApplication a(argc, argv);
@@ -36,6 +38,22 @@ int main(int argc, char *argv[]) {
 
     MatrixGuiList mt;
     mt.show();
+
+    QVector<QVector<double>> vec = { {1,2},
+                           {3,4}
+    };
+
+    Matrix<double> matrix1(vec);
+    Matrix<double> matrix2(vec);
+
+    cout << matrix1;
+
+    matrix1*=matrix2;
+    Matrix<double> matrix3(matrix2);
+    matrix3+=matrix2;
+
+    cout << matrix1 << matrix3;
+
     a.exec();
     return 0;
 }

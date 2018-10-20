@@ -1,16 +1,11 @@
 #ifndef MATRIX_MATRIX_H
 #define MATRIX_MATRIX_H
 
-#include <QDebug>
 #include <QVector>
 #include <iostream>
 
 using namespace std;
 
-
-static const string init_throw = "Rows and columns <= 1";
-static const string dimensions_throw = "The dimensions of the matrices should be the same";
-static const string multiplication_throw = "The number of columns of the first matrix should be equal to the number of rows of the second";
 
 template<class T>
 class Matrix : QObject {
@@ -22,17 +17,10 @@ public:
     Matrix<T>(const Matrix<T> &mt) : _matrix{mt._matrix} {}
 
     explicit Matrix<T>(const QVector<QVector<T>> &mt) {
-        if (mt.size() <= 1 && mt.at(0).size() <= 1) {
-            throw init_throw;
-        }
-
         _matrix = mt;
     }
 
     Matrix<T>(int rows, int columns, T value = 0) {
-        if (rows <= 1 && columns <= 1)
-            throw init_throw;
-
         _matrix.clear();
         _matrix.resize(rows);
         for (auto &column : _matrix) {
@@ -57,7 +45,8 @@ public:
 
     Matrix<T> operator+(const Matrix<T> &mt) {
         if (!is_equal_dimension(mt)) {
-            throw dimensions_throw;
+            throw std::runtime_error("Dimension of the first matrix should be equal to dimension of the second");
+
         }
 
         Matrix<T> new_mt{rows(), columns()};
@@ -72,7 +61,7 @@ public:
 
     Matrix<T> operator-(const Matrix<T> &mt) {
         if (!is_equal_dimension(mt)) {
-            throw dimensions_throw;
+            throw std::runtime_error("Dimension of the first matrix should be equal to dimension of the second");
         }
 
         Matrix<T> new_mt{rows(), columns()};
@@ -85,9 +74,9 @@ public:
         return new_mt;
     }
 
-    Matrix<T> operator*(const Matrix<T> &mt) {
+    Matrix<T> operator*(const Matrix<T> &mt){
         if (columns() != mt.rows()) {
-            throw multiplication_throw;
+            throw std::runtime_error("The number of columns of the first matrix should be equal to the number of rows of the second");
         }
 
         Matrix<T> new_mt{rows(), mt.columns()};
@@ -153,8 +142,8 @@ public:
         mt._matrix.clear();
         mt._matrix.resize(columns);
 
-        for (ulong i = 0; i < columns; ++i) {
-            mt._matrix.at(i).resize(rows);
+        for (int i = 0; i < columns; ++i) {
+            mt._matrix[i].resize(rows);
         }
 
         for (ulong i = 0; i < rows; ++i) {

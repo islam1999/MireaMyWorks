@@ -1,27 +1,39 @@
 #ifndef MATRIX_MATRIXGUI_H
 #define MATRIX_MATRIXGUI_H
 
-#include <QWidget>
+#include <QDoubleValidator>
+#include <QtAlgorithms>
 #include <QGridLayout>
 #include <QLineEdit>
-#include <QDoubleValidator>
-#include <QVector>
-#include <QtAlgorithms>
+#include <QWidget>
 #include "Matrix.h"
 
 class MatrixGui : public QWidget {
-    Q_OBJECT
+Q_OBJECT
 
 public:
-    explicit MatrixGui(QWidget * parent = 0 );
+    explicit MatrixGui(QWidget *parent = 0);
+
+    MatrixGui(Matrix<double> *mtx, QWidget *parent = 0) : QWidget(parent), matrix(mtx) {}
 
     ~MatrixGui();
 
+    MatrixGui *operator+(MatrixGui &gui);
+
+    MatrixGui *operator-(MatrixGui &gui);
+
+    MatrixGui *operator*(MatrixGui &gui);
+
+    friend istream &operator>>(istream &is, MatrixGui &gui);
+
+    friend ostream &operator<<(ostream &os, const MatrixGui &gui);
+
 private:
-    QVector <QVector<QLineEdit *>> cells;
-    QGridLayout cellsLayout;
-    QDoubleValidator* validator;
-    int defCellsRes = 3;
+    QVector<QVector<QLineEdit *>> cells;
+    QGridLayout *cellsLayout;
+    QDoubleValidator *validator;
+    Matrix<double> *matrix;
+    u_int defCellsRes = 3;
 };
 
 

@@ -1,28 +1,34 @@
 /*
- * Постановка задачи. Разработать программу, выполняющую операции над целочисленным динамическим массивом из n элементов (n<=100):
-    * ввод массива;
-    * вывод массива на экран;
-    * дополнительные операции.
- * Алгоритмы выполнения операций оформить в виде функций. В алгоритмах выполнения операций добавления и удаления элементов предусмотреть проверку возможности выполнения операций.
- * Программа должна выводить текстовое меню для тестирования операций.
- * 11 Поиск номера первого максимального элемента Добавление перед каждым нулевым числом числа х
+ * Постановка задачи. Разработать программу, выполняющую операции над
+ * целочисленным динамическим массивом из n элементов (n<=100):
+ * ввод массива;
+ * вывод массива на экран;
+ * дополнительные операции.
+ * Алгоритмы выполнения операций оформить в виде функций. В алгоритмах
+ * выполнения операций добавления и удаления элементов предусмотреть проверку
+ * возможности выполнения операций. Программа должна выводить текстовое меню для
+ * тестирования операций. 11 Поиск номера первого максимального элемента
+ * Добавление перед каждым нулевым числом числа х
  */
 
-#include <iostream>
-#include <fstream>
-#include <vector>
 #include <algorithm>
+#include <fstream>
+#include <iostream>
+#include <vector>
 
 using namespace std;
 
-void input_array(istream &stream, vector<long> &array) {
+int input_array(istream &stream, vector<long> &array) {
     ulong size = 0;
     stream >> size;
+    if (size > 100)
+        return 1;
     array.clear();
     array.resize(size);
     for (ulong i = 0; i < size; ++i) {
         stream >> array[i];
     }
+    return 0;
 }
 
 void print_array(ostream &stream, vector<long> &array) {
@@ -60,26 +66,25 @@ int main() {
         cin >> input;
         input = static_cast<char>(tolower(input));
         switch (input) {
-
-            case 'i':
-                cout << "Input size, elements..." << endl;
-                input_array(cin, array);
-                break;
-
-            case 'p':
-                print_array(cout, array);
-                break;
-            case 's':
-                cout << "Max element index: " << search_max(array) << endl;
-                break;
-            case 'x':
-                cout << "Input X: ";
-                cin >> x;
-                add_x(array, x);
-                break;
-            default:
-                cout << "Something went wrong, call fixies!" << endl;
-                break;
+        case 'i':
+            cout << "Input size, elements..." << endl;
+            if (input_array(cin, array))
+                cout << "Size must be <=100!" << endl;
+            break;
+        case 'p':
+            print_array(cout, array);
+            break;
+        case 's':
+            cout << "Max element index: " << search_max(array) << endl;
+            break;
+        case 'x':
+            cout << "Input X: ";
+            cin >> x;
+            add_x(array, x);
+            break;
+        default:
+            cout << "Something went wrong, call fixies!" << endl;
+            break;
         }
     }
     return 0;
