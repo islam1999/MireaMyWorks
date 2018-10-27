@@ -3,7 +3,7 @@
  * Матрица должна быть представлена в памяти в виде указателя на массив указателей на строки матрицы
  * (одномерные динамические массивы).
  *
- * +Операции:
+ * Операции:
  *   + создание матрицы из чисел текстового файла (первые два числа файла – размеры матрицы);
  *   + построчный вывод матрицы;
  *   + разность двух матриц;
@@ -26,34 +26,20 @@
 #include <AutoTest.h>
 #endif
 
-#include "Matrix.h"
 
 int main(int argc, char *argv[]) {
 
-    QApplication a(argc, argv);
+    QApplication qApplication(argc, argv);
 
 #ifdef QT_DEBUG
     AutoTest::runAllTests(argc, argv);
 #endif
 
     MatrixGuiList mt;
+    mt.setMaximumSize(200, 250);
     mt.show();
 
-    QVector<QVector<double>> vec = { {1,2},
-                           {3,4}
-    };
+    QApplication::exec();
 
-    Matrix<double> matrix1(vec);
-    Matrix<double> matrix2(vec);
-
-    cout << matrix1;
-
-    matrix1*=matrix2;
-    Matrix<double> matrix3(matrix2);
-    matrix3+=matrix2;
-
-    cout << matrix1 << matrix3;
-
-    a.exec();
     return 0;
 }

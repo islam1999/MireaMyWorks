@@ -1,27 +1,33 @@
 #ifndef MATRIX_MATRIXGUILIST_H
 #define MATRIX_MATRIXGUILIST_H
 
-#include <QStack>
 #include <QHBoxLayout>
-#include <QScrollArea>
-#include <QtWidgets/QPushButton>
+#include <QPushButton>
+#include <QComboBox>
 #include <QLabel>
+#include <fstream>
 #include "MatrixGui.h"
 
 class MatrixGuiList : public QWidget {
 Q_OBJECT
 
 public:
-    explicit MatrixGuiList(QWidget *parent = 0);
+    explicit MatrixGuiList(QWidget *parent = nullptr);
 
-    ~MatrixGuiList();
+    ~MatrixGuiList() override;
+
+    QVector<MatrixGui<double> *> matrices;
 
 public slots:
 
+    void calculateResult();
+
 private:
-    std::array<MatrixGui *, 3> array;
+    void createUI();
+
     QHBoxLayout *boxLayout;
-    QScrollArea *scrollArea;
+    QComboBox *comboBox;
+    std::fstream file;
 };
 
 
