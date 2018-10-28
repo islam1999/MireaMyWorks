@@ -30,10 +30,8 @@ public:
 
     void resize(int rows, int columns) {
         _matrix.resize(rows);
-        qDebug() << "Rows: " << _matrix.size();
         for (auto &column : _matrix) {
             column.resize(columns);
-            qDebug() << "  Column " << column.size();
         }
 
     }

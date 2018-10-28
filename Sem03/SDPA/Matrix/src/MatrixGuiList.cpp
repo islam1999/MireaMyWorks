@@ -1,4 +1,3 @@
-
 #include <MatrixGuiList.h>
 
 MatrixGuiList::MatrixGuiList(QWidget *parent) : QWidget(parent) {
