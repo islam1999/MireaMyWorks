@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QComboBox>
 #include <QLabel>
+#include <QMessageBox>
 #include <fstream>
 #include "MatrixGui.h"
 
@@ -16,7 +17,7 @@ public:
 
     ~MatrixGuiList() override;
 
-    QVector<MatrixGui<double> *> matrices;
+    QVector<MatrixGui *> _matrices;
 
 public slots:
 
@@ -27,7 +28,7 @@ private:
 
     QHBoxLayout *boxLayout;
     QComboBox *comboBox;
-    std::fstream file;
+    std::string fileName = "data.csv";
 };
 
 

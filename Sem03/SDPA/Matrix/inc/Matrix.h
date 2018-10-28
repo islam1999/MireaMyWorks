@@ -2,6 +2,7 @@
 #define MATRIX_MATRIX_H
 
 #include <QVector>
+#include <QDebug>
 #include <iostream>
 
 
@@ -29,7 +30,12 @@ public:
 
     void resize(int rows, int columns) {
         _matrix.resize(rows);
-        _matrix[0].resize(columns);
+        qDebug() << "Rows: " << _matrix.size();
+        for (auto &column : _matrix) {
+            column.resize(columns);
+            qDebug() << "  Column " << column.size();
+        }
+
     }
 
     void setValue(int row, int column, T value) {
@@ -55,7 +61,7 @@ public:
 
     template<typename D>
     friend Matrix<T> operator*(const Matrix<T> &mtx, D digit) {
-        Matrix<T> matrix;
+        Matrix<T> matrix(mtx.rows(), mtx.columns());
         for (int i = 0; i < mtx.rows(); ++i) {
             for (int j = 0; j < mtx.columns(); ++j) {
                 matrix._matrix[i][j] = mtx._matrix[i][j] * digit;

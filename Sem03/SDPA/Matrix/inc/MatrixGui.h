@@ -4,31 +4,31 @@
 #include <QDoubleValidator>
 #include <QGridLayout>
 #include <QLineEdit>
+#include <QPushButton>
 #include <QWidget>
 #include "Matrix.h"
 
-template<typename T>
 class MatrixGui : public QWidget {
-
+Q_OBJECT
 public:
 
-    explicit MatrixGui() {
+    explicit MatrixGui(QWidget *parent = nullptr) : QWidget(parent) {
         createUI();
     }
 
 
-    MatrixGui(const Matrix<T> &mtx, QWidget *parent = nullptr) : QWidget(parent), _matrix(mtx) {
+    explicit MatrixGui(const Matrix<double> &mtx, QWidget *parent = nullptr) : QWidget(parent), _matrix(mtx) {
         createUI();
     }
 
     ~MatrixGui() override {
-        delete validator;
-        delete cellsLayout;
+        delete _validator;
+        delete _layout;
         for (auto &qVec : _cells)
             qDeleteAll(qVec);
     }
 
-    const Matrix<T> &matrix() {
+    const Matrix<double> &matrix() const {
         return _matrix;
     }
 
@@ -40,7 +40,7 @@ public:
         return _cells[0].size();
     }
 
-    void setMatrix(const Matrix<T> &mtx) {
+    void setMatrix(const Matrix<double> &mtx) {
         _matrix = mtx;
     }
 
@@ -53,6 +53,8 @@ public:
             }
         }
     }
+
+public slots:
 
     void updateGui() {
         while (QLayoutItem *item = cellsLayout->takeAt(0)) {
@@ -70,62 +72,87 @@ public:
         }
     }
 
-    Matrix<T> &operator+=(const Matrix<T> &mt) {
-        return *this = matrix() + mt;
+    void increaseRow() {
+        updateFromGui();
+        if (rows() > _maxSize)
+            return;
+        _matrix.resize(rows() + 1, columns());
+        updateGui();
     }
 
-    MatrixGui<T> &operator-=(const MatrixGui<T> &mtx) {
-        *this = matrix() - mtx;
+    void increaseColumn() {
+        updateFromGui();
+        if (columns() > _maxSize)
+            return;
+        _matrix.resize(rows(), columns() + 1);
+        updateGui();
     }
 
-    MatrixGui<T> &operator*=(const MatrixGui<T> &mtx) {
-        return *this = matrix() * mtx;
+    void decreaseRow() {
+        updateFromGui();
+        if (rows() == 1)
+            return;
+        _matrix.resize(rows() - 1, columns());
+        updateGui();
     }
 
-    friend MatrixGui<T> operator+(const MatrixGui<T> &left, const MatrixGui<T> &right) {
-        return MatrixGui<T>(left.matrix() + right.matrix());
-    }
-
-    friend MatrixGui<T> operator-(const MatrixGui<T> &left, const MatrixGui<T> &right) {
-        return MatrixGui<T>(left.matrix() - right.matrix());
-    }
-
-    friend MatrixGui<T> operator*(const MatrixGui<T> &left, const MatrixGui<T> &right) {
-        return MatrixGui<T>(left.matrix() * right.matrix());
-    }
-
-    friend std::istream &operator>>(std::istream &is, MatrixGui<T> &mtx) {
-        is >> mtx.matrix();
-        return is;
-    }
-
-    friend std::ostream &operator<<(std::ostream &os, const MatrixGui<T> &mtx) {
-        os << mtx.matrix();
-        return os;
+    void decreaseColumn() {
+        updateFromGui();
+        if (columns() == 1)
+            return;
+        _matrix.resize(rows(), columns() - 1);
+        updateGui();
     }
 
 private:
     void createUI() {
         cellsLayout = new QGridLayout;
-        validator = new QDoubleValidator;
+        _layout = new QVBoxLayout();
+        _buttonsLayout = new QGridLayout();
+
+        _increaseRow = new QPushButton("Row +");
+        _increaseColumn = new QPushButton("Column +");
+        _decreaseRow = new QPushButton("Row -");
+        _decreaseColumn = new QPushButton("Column -");
+
+        connect(_increaseRow, SIGNAL(clicked()), this, SLOT(increaseRow()));
+        connect(_increaseColumn, SIGNAL(clicked()), this, SLOT(increaseColumn()));
+        connect(_decreaseRow, SIGNAL(clicked()), this, SLOT(decreaseRow()));
+        connect(_decreaseColumn, SIGNAL(clicked()), this, SLOT(decreaseColumn()));
+
+        _validator = new QDoubleValidator;
         _cells.resize(_matrix.rows());
         for (int i = 0; i < _cells.size(); ++i) {
             _cells[i].resize(_matrix.columns());
             for (int j = 0; j < _cells[i].size(); ++j) {
                 auto *lineEdit = new QLineEdit(QString::number(_matrix.value(i, j)));
-                lineEdit->setValidator(validator);
+                lineEdit->setValidator(_validator);
 
                 _cells[i][j] = lineEdit;
                 cellsLayout->addWidget(_cells.at(i).at(j), i, j);
             }
         }
-        setLayout(cellsLayout);
+        _buttonsLayout->addWidget(_increaseRow, 0, 0);
+        _buttonsLayout->addWidget(_increaseColumn, 0, 1);
+        _buttonsLayout->addWidget(_decreaseRow, 1, 0);
+        _buttonsLayout->addWidget(_decreaseColumn, 1, 1);
+
+        _layout->addLayout(cellsLayout);
+        _layout->addLayout(_buttonsLayout);
+        setLayout(_layout);
     }
 
-    Matrix<T> _matrix;
     QGridLayout *cellsLayout;
+    QVBoxLayout *_layout;
+    QGridLayout *_buttonsLayout;
+    QDoubleValidator *_validator;
+    QPushButton *_increaseRow;
+    QPushButton *_decreaseRow;
+    QPushButton *_decreaseColumn;
+    QPushButton *_increaseColumn;
     QVector<QVector<QLineEdit *>> _cells;
-    QDoubleValidator *validator;
+    Matrix<double> _matrix;
+    static constexpr int _maxSize = 9;
 };
 
 

@@ -2,22 +2,36 @@
 #include <MatrixGuiList.h>
 
 MatrixGuiList::MatrixGuiList(QWidget *parent) : QWidget(parent) {
-    file.open("data.csv");
+    _matrices.resize(3);
+    std::ifstream file(fileName);
+    try {
+        std::cout << "File reading start" << std::endl;
+        for (int i = 0; i < 2; ++i) {
+            Matrix<double> mtx;
+            file >> mtx;
+            if (!mtx.rows() || !mtx.columns()) {
+                throw std::runtime_error("No integer!");
+            }
+            auto *matrixGui = new MatrixGui(mtx);
+            _matrices[i] = matrixGui;
+        }
+        std::cout << "File reading end" << std::endl;
+    } catch (...) {
+        std::cout << "File reading error!" << std::endl;
+        QMessageBox::warning(this, "Error", "Uncorrected data in file!", QMessageBox::Ok);
 
-    for (int i = 0; i < 2; ++i) {
-        Matrix<double> mtx;
-        file >> mtx;
-        auto *matrixGui = new MatrixGui<double>(mtx);
-        matrices.push_back(matrixGui);
+        for (int i = 0; i < 2; ++i) {
+            _matrices[i] = new MatrixGui;
+        }
     }
-    matrices.push_back(new MatrixGui<double>);
     file.close();
+    _matrices[2] = new MatrixGui;
     createUI();
 }
 
 MatrixGuiList::~MatrixGuiList() {
-    file.open("data.csv");
-    file << matrices[0]->matrix() << matrices[1]->matrix();
+    std::ofstream file(fileName);
+    file << _matrices[0]->matrix() << _matrices[1]->matrix();
     file.close();
     delete boxLayout;
 }
@@ -27,37 +41,41 @@ void MatrixGuiList::createUI() {
     QStringList operations = {"+", "-", "*", "=="};
     comboBox = new QComboBox();
     comboBox->addItems(operations);
-    for (int i = 0; i < matrices.size() - 1; ++i) {
-        boxLayout->addWidget(matrices[i]);
+    for (int i = 0; i < _matrices.size() - 1; ++i) {
+        boxLayout->addWidget(_matrices[i]);
         if (i == 0)
             boxLayout->addWidget(comboBox);
     }
     auto *result_button = new QPushButton("=");
     connect(result_button, SIGNAL(clicked()), this, SLOT(calculateResult()));
     boxLayout->addWidget(result_button);
-    boxLayout->addWidget(matrices.last());
+    boxLayout->addWidget(_matrices.last());
     setLayout(boxLayout);
 }
 
 void MatrixGuiList::calculateResult() {
-    matrices[0]->updateFromGui();
-    matrices[1]->updateFromGui();
+    _matrices[0]->updateFromGui();
+    _matrices[1]->updateFromGui();
 
     QString choice = comboBox->currentText();
     Matrix<double> mtx;
-    if (choice == "+") {
-        mtx = matrices[0]->matrix() + matrices[1]->matrix();
-    } else if (choice == "-") {
-        mtx = matrices[0]->matrix() - matrices[1]->matrix();
-    } else if (choice == "*") {
-        if (matrices[1]->matrix().columns() == 1 && matrices[1]->matrix().rows() == 1) {
-            mtx = matrices[0]->matrix() * matrices[1]->matrix().value(0, 0);
+    try {
+        if (choice == "+") {
+            mtx = _matrices[0]->matrix() + _matrices[1]->matrix();
+        } else if (choice == "-") {
+            mtx = _matrices[0]->matrix() - _matrices[1]->matrix();
+        } else if (choice == "*") {
+            if (_matrices[1]->columns() == 1 && _matrices[1]->rows() == 1) {
+                mtx = _matrices[0]->matrix() * _matrices[1]->matrix().value(0, 0);
+            } else mtx = _matrices[0]->matrix() * _matrices[1]->matrix();
+        } else if (choice == "==") {
+            bool equal = _matrices[0]->matrix() == _matrices[1]->matrix();
+            mtx = equal ? Matrix<double>(1, 1, 1) : Matrix<double>(1, 1, 0);
         }
-        mtx = matrices[0]->matrix() * matrices[1]->matrix();
-    } else if (choice == "==") {
-        bool equal = matrices[0]->matrix() == matrices[1]->matrix();
-        mtx = equal ? Matrix<double>(1, 1, 1) : Matrix<double>(1, 1, 0);
+    } catch (...) {
+        QMessageBox::warning(this, "Error", "Invalid operation with this matrices!", QMessageBox::Ok);
+        return;
     }
-    matrices[2]->setMatrix(mtx);
-    matrices[2]->updateGui();
+    _matrices[2]->setMatrix(mtx);
+    _matrices[2]->updateGui();
 }
