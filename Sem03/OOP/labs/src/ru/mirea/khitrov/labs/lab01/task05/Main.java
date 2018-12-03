@@ -7,7 +7,7 @@ public class Main {
             return 1;
         } else {
             int result = 1;
-            for (int i = 1; i < number; i++) {
+            for (int i = 1; i <= number; i++) {
                 result *= i;
             }
             return result;
